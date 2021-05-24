@@ -94,4 +94,29 @@ public class LikePostRepositoryTest {
         assertThat(persistedLikePost.getUser().getId(), equalTo(user.getId()));
         assertThat(persistedLikePost.getUser().getEmail(), equalTo("dummy@mail.com"));
     }
+
+    @Test
+    void shouldChangeBlogPostInLikePost() {
+
+        LikePost persistedLikePost = new LikePost();
+        persistedLikePost.setUser(dummyUser);
+        persistedLikePost.setPost(dummyBlogPost);
+        testEntityManager.persistAndFlush(persistedLikePost);
+
+        BlogPost newBlogPost = new BlogPost();
+        newBlogPost.setEntry("Dummy BlogPost Entry");
+        newBlogPost.setUser(dummyUser);
+        testEntityManager.persistAndFlush(newBlogPost);
+
+        LikePost likePost = new LikePost();
+        likePost.setId(persistedLikePost.getId());
+        likePost.setPost(newBlogPost);
+        likePost.setUser(dummyUser);
+        likePostRepository.save(likePost);
+
+        testEntityManager.flush();
+        testEntityManager.refresh(persistedLikePost);
+        assertThat(persistedLikePost.getPost().getId(), equalTo(newBlogPost.getId()));
+        assertThat(persistedLikePost.getPost().getEntry(), equalTo("Dummy BlogPost Entry"));
+    }
 }
