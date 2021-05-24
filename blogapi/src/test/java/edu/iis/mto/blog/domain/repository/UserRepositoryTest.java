@@ -1,21 +1,17 @@
 package edu.iis.mto.blog.domain.repository;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
-
-import java.util.List;
-
+import edu.iis.mto.blog.domain.model.AccountStatus;
+import edu.iis.mto.blog.domain.model.User;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
-import edu.iis.mto.blog.domain.model.AccountStatus;
-import edu.iis.mto.blog.domain.model.User;
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 @DataJpaTest
 class UserRepositoryTest {
@@ -30,25 +26,25 @@ class UserRepositoryTest {
 
     @BeforeEach
     void setUp() {
+        repository.deleteAll();
+        repository.flush();
+
         user = new User();
         user.setFirstName("Jan");
         user.setEmail("john@domain.com");
         user.setAccountStatus(AccountStatus.NEW);
     }
 
-    @Disabled
     @Test
     void shouldFindNoUsersIfRepositoryIsEmpty() {
 
         List<User> users = repository.findAll();
-
         assertThat(users, hasSize(0));
     }
 
-    @Disabled
     @Test
     void shouldFindOneUsersIfRepositoryContainsOneUserEntity() {
-        User persistedUser = entityManager.persist(user);
+        User persistedUser = repository.save(user);
         List<User> users = repository.findAll();
 
         assertThat(users, hasSize(1));
@@ -57,7 +53,6 @@ class UserRepositoryTest {
                 equalTo(persistedUser.getEmail()));
     }
 
-    @Disabled
     @Test
     void shouldStoreANewUser() {
 
