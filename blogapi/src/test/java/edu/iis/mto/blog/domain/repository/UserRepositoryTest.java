@@ -12,6 +12,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 class UserRepositoryTest {
@@ -31,6 +32,7 @@ class UserRepositoryTest {
 
         user = new User();
         user.setFirstName("Jan");
+        user.setLastName("Nowak");
         user.setEmail("john@domain.com");
         user.setAccountStatus(AccountStatus.NEW);
     }
@@ -57,8 +59,55 @@ class UserRepositoryTest {
     void shouldStoreANewUser() {
 
         User persistedUser = repository.save(user);
-
         assertThat(persistedUser.getId(), notNullValue());
     }
+
+    @Test
+    void shouldFindUserByFirstName() {
+
+        int expectedNumberOfResults = 1;
+        User persistedUser = entityManager.persist(user);
+
+        List<User> users = repository.findByFirstNameContainingOrLastNameContainingOrEmailContainingAllIgnoreCase(persistedUser.getFirstName(), " ", " ");
+
+        assertEquals(expectedNumberOfResults, users.size());
+        assertEquals(persistedUser.getId(), users.get(0).getId());
+    }
+
+    @Test
+    void shouldFindUserByLastName() {
+
+        int expectedNumberOfResults = 1;
+        User persistedUser = entityManager.persist(user);
+
+        List<User> users = repository.findByFirstNameContainingOrLastNameContainingOrEmailContainingAllIgnoreCase(" ", persistedUser.getLastName(), " ");
+
+        assertEquals(expectedNumberOfResults, users.size());
+        assertEquals(persistedUser.getId(), users.get(0).getId());
+    }
+
+    @Test
+    void shouldFindUserByEmail() {
+
+        int expectedNumberOfResults = 1;
+        User persistedUser = entityManager.persist(user);
+
+        List<User> users = repository.findByFirstNameContainingOrLastNameContainingOrEmailContainingAllIgnoreCase(" ", " ", persistedUser.getEmail());
+
+        assertEquals(expectedNumberOfResults, users.size());
+        assertEquals(persistedUser.getId(), users.get(0).getId());
+    }
+
+    @Test
+    void shouldNotFindUser() {
+
+        int expectedNumberOfResults = 0;
+        entityManager.persist(user);
+
+        List<User> users = repository.findByFirstNameContainingOrLastNameContainingOrEmailContainingAllIgnoreCase(" ", " ", " ");
+
+        assertEquals(expectedNumberOfResults, users.size());
+    }
+
 
 }
