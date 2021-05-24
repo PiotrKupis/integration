@@ -69,4 +69,29 @@ public class LikePostRepositoryTest {
         assertThat(dummyBlogPost.getLikesCount(), equalTo(1));
         assertThat(dummyBlogPost.getLikes().get(0), equalTo(persistedLikePost));
     }
+
+    @Test
+    void shouldChangeUserInLikePost() {
+
+        LikePost persistedLikePost = new LikePost();
+        persistedLikePost.setUser(dummyUser);
+        persistedLikePost.setPost(dummyBlogPost);
+        testEntityManager.persistAndFlush(persistedLikePost);
+
+        User user = new User();
+        user.setAccountStatus(AccountStatus.CONFIRMED);
+        user.setEmail("dummy@mail.com");
+        testEntityManager.persistAndFlush(user);
+
+        LikePost likePost = new LikePost();
+        likePost.setId(persistedLikePost.getId());
+        likePost.setPost(dummyBlogPost);
+        likePost.setUser(user);
+        likePostRepository.save(likePost);
+        testEntityManager.flush();
+
+        testEntityManager.refresh(persistedLikePost);
+        assertThat(persistedLikePost.getUser().getId(), equalTo(user.getId()));
+        assertThat(persistedLikePost.getUser().getEmail(), equalTo("dummy@mail.com"));
+    }
 }
