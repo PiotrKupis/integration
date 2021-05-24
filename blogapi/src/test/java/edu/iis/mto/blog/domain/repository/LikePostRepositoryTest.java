@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 @DataJpaTest
@@ -54,5 +55,18 @@ public class LikePostRepositoryTest {
         likePost.setPost(dummyBlogPost);
         LikePost persistedLikePost = likePostRepository.save(likePost);
         assertThat(persistedLikePost.getId(), notNullValue());
+    }
+
+    @Test
+    void shouldAddSavedLikePostToLikesInBlogPost() {
+
+        LikePost likePost = new LikePost();
+        likePost.setUser(dummyUser);
+        likePost.setPost(dummyBlogPost);
+        LikePost persistedLikePost = likePostRepository.save(likePost);
+
+        testEntityManager.refresh(dummyBlogPost);
+        assertThat(dummyBlogPost.getLikesCount(), equalTo(1));
+        assertThat(dummyBlogPost.getLikes().get(0), equalTo(persistedLikePost));
     }
 }
