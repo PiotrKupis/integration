@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
+import java.util.Optional;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -118,5 +120,21 @@ public class LikePostRepositoryTest {
         testEntityManager.refresh(persistedLikePost);
         assertThat(persistedLikePost.getPost().getId(), equalTo(newBlogPost.getId()));
         assertThat(persistedLikePost.getPost().getEntry(), equalTo("Dummy BlogPost Entry"));
+    }
+
+    @Test
+    void shouldFindLikePostByUserAndPost() {
+
+        LikePost persistedLikePost = new LikePost();
+        persistedLikePost.setUser(dummyUser);
+        persistedLikePost.setPost(dummyBlogPost);
+        testEntityManager.persistAndFlush(persistedLikePost);
+
+        Optional<LikePost> optionalLikePost = likePostRepository.findByUserAndPost(dummyUser, dummyBlogPost);
+
+        assertThat(optionalLikePost.isPresent(), equalTo(true));
+        LikePost likePost = optionalLikePost.get();
+        assertThat(likePost.getPost().getId(), equalTo(dummyBlogPost.getId()));
+        assertThat(likePost.getUser().getId(), equalTo(dummyUser.getId()));
     }
 }
