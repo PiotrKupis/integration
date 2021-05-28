@@ -35,4 +35,17 @@ public class CreateLikePostTest extends FunctionalTests {
                 .when()
                 .post(CREATE_LIKE_POST_API);
     }
+
+    @Test
+    void shouldNotLikePostWhenUserIsNotConfirmed() {
+        given().accept(ContentType.JSON)
+                .header("Content-Type", "application/json;charset=UTF-8")
+                .pathParams("userId", 2, "postId", 1)
+                .expect()
+                .log()
+                .all()
+                .statusCode(HttpStatus.SC_BAD_REQUEST)
+                .when()
+                .post(CREATE_LIKE_POST_API);
+    }
 }
