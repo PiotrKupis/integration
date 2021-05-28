@@ -4,6 +4,7 @@ import edu.iis.mto.blog.api.request.UserRequest;
 import edu.iis.mto.blog.domain.errors.DomainError;
 import edu.iis.mto.blog.domain.model.AccountStatus;
 import edu.iis.mto.blog.domain.model.BlogPost;
+import edu.iis.mto.blog.domain.model.LikePost;
 import edu.iis.mto.blog.domain.model.User;
 import edu.iis.mto.blog.domain.repository.BlogPostRepository;
 import edu.iis.mto.blog.domain.repository.LikePostRepository;
@@ -19,10 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -44,8 +47,11 @@ class BlogManagerTest {
 
     @Captor
     private ArgumentCaptor<User> userParam;
+    @Captor
+    private ArgumentCaptor<LikePost> likePostParam;
 
     private User dummyUser;
+    private User dummyUserThatLikePost;
     private BlogPost dummyBlogPost;
 
     @BeforeEach
@@ -54,6 +60,11 @@ class BlogManagerTest {
         dummyUser.setAccountStatus(AccountStatus.CONFIRMED);
         dummyUser.setEmail("kowalski@mail.com");
         dummyUser.setId(1L);
+
+        dummyUserThatLikePost = new User();
+        dummyUserThatLikePost.setAccountStatus(AccountStatus.NEW);
+        dummyUserThatLikePost.setEmail("nowak@mail.com");
+        dummyUserThatLikePost.setId(2L);
 
         dummyBlogPost = new BlogPost();
         dummyBlogPost.setEntry("Dummy Entry");
@@ -72,10 +83,30 @@ class BlogManagerTest {
     @Test
     void shouldThrowDomainErrorWhenUserTryLikesThePostWithDifferentStatusThanConfirmed() {
 
-        when(userRepository.findById(any())).thenReturn(Optional.of(dummyUser));
+        when(userRepository.findById(any())).thenReturn(Optional.of(dummyUserThatLikePost));
         when(blogPostRepository.findById(any())).thenReturn(Optional.of(dummyBlogPost));
+        assertThrows(DomainError.class, () -> blogService.addLikeToPost(dummyUserThatLikePost.getId(), dummyBlogPost.getId()));
+    }
 
-        assertThrows(DomainError.class, () -> blogService.addLikeToPost(dummyUser.getId(), dummyBlogPost.getId()));
+    @Test
+    void shouldAddLikeToPostWhenUserIsConfirmed() {
+
+        int expectedNumberOfLikesUnderPost = 1;
+        dummyUserThatLikePost.setAccountStatus(AccountStatus.CONFIRMED);
+
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(dummyUserThatLikePost));
+        when(blogPostRepository.findById(any(Long.class))).thenReturn(Optional.of(dummyBlogPost));
+        when(likePostRepository.findByUserAndPost(any(User.class), any(BlogPost.class))).thenReturn(Optional.empty());
+
+        blogService.addLikeToPost(dummyUserThatLikePost.getId(), dummyBlogPost.getId());
+
+        verify(likePostRepository).save(likePostParam.capture());
+        List<LikePost> capturedLikePosts = likePostParam.getAllValues();
+        assertEquals(expectedNumberOfLikesUnderPost, capturedLikePosts.size());
+
+        LikePost capturedLikePost = capturedLikePosts.get(0);
+        assertEquals(dummyUserThatLikePost, capturedLikePost.getUser());
+        assertEquals(dummyBlogPost, capturedLikePost.getPost());
     }
 
 }
