@@ -4,7 +4,6 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
@@ -28,6 +27,18 @@ public class GetPostTest extends FunctionalTests {
 
         JSONArray responseBody = new JSONArray(response.getBody().asString());
         assertThat(responseBody.length(), equalTo(2));
+    }
+
+    @Test
+    void shouldNotReturnPostsWhenUserHasStatusRemoved() {
+        given().accept(ContentType.JSON)
+                .pathParams("id", 5)
+                .expect()
+                .log()
+                .all()
+                .statusCode(HttpStatus.SC_BAD_REQUEST)
+                .when()
+                .get(GET_USER_POST_API);
     }
 
 }
