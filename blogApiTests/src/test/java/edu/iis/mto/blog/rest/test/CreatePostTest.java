@@ -25,4 +25,19 @@ public class CreatePostTest extends FunctionalTests {
                 .when()
                 .post(CREATE_POST_API);
     }
+
+    @Test
+    void shouldNotCreatePostWhenUserIsNotConfirmed() {
+        JSONObject jsonObj = new JSONObject().put("entry", "dummy entry");
+        given().accept(ContentType.JSON)
+                .header("Content-Type", "application/json;charset=UTF-8")
+                .pathParam("userid", 2)
+                .body(jsonObj.toString())
+                .expect()
+                .log()
+                .all()
+                .statusCode(HttpStatus.SC_BAD_REQUEST)
+                .when()
+                .post(CREATE_POST_API);
+    }
 }

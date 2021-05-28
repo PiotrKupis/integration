@@ -1,11 +1,5 @@
 package edu.iis.mto.blog.domain;
 
-import java.util.Optional;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import edu.iis.mto.blog.api.request.PostRequest;
 import edu.iis.mto.blog.api.request.UserRequest;
 import edu.iis.mto.blog.domain.errors.DomainError;
@@ -18,13 +12,18 @@ import edu.iis.mto.blog.domain.repository.LikePostRepository;
 import edu.iis.mto.blog.domain.repository.UserRepository;
 import edu.iis.mto.blog.mapper.BlogDataMapper;
 import edu.iis.mto.blog.services.BlogService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED)
 public class BlogManager extends DomainService implements BlogService {
 
     protected BlogManager(UserRepository userRepository, BlogPostRepository blogPostRepository, LikePostRepository likePostRepository,
-            BlogDataMapper mapper) {
+                          BlogDataMapper mapper) {
         super(userRepository, blogPostRepository, likePostRepository, mapper);
     }
 
@@ -39,7 +38,10 @@ public class BlogManager extends DomainService implements BlogService {
     @Override
     public Long createPost(Long userId, PostRequest postRequest) {
         User user = userRepository.findById(userId)
-                                  .orElseThrow(domainError(DomainError.USER_NOT_FOUND));
+                .orElseThrow(domainError(DomainError.USER_NOT_FOUND));
+        if (user.getAccountStatus() != AccountStatus.CONFIRMED) {
+            throw new DomainError("USER_NOT_CONFIRMED");
+        }
         BlogPost post = mapper.mapToEntity(postRequest);
         post.setUser(user);
         blogPostRepository.save(post);
@@ -49,14 +51,14 @@ public class BlogManager extends DomainService implements BlogService {
     @Override
     public boolean addLikeToPost(Long userId, Long postId) {
         User user = userRepository.findById(userId)
-                                  .orElseThrow(domainError(DomainError.USER_NOT_FOUND));
-        if(user.getAccountStatus() != AccountStatus.CONFIRMED) {
+                .orElseThrow(domainError(DomainError.USER_NOT_FOUND));
+        if (user.getAccountStatus() != AccountStatus.CONFIRMED) {
             throw new DomainError("USER_NOT_CONFIRMED");
         }
 
 
         BlogPost post = blogPostRepository.findById(postId)
-                                          .orElseThrow(domainError(DomainError.POST_NOT_FOUND));
+                .orElseThrow(domainError(DomainError.POST_NOT_FOUND));
         if (post.getUser()
                 .getId()
                 .equals(userId)) {
