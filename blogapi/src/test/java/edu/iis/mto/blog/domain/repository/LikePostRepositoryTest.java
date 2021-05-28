@@ -15,6 +15,7 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DataJpaTest
 public class LikePostRepositoryTest {
@@ -56,7 +57,7 @@ public class LikePostRepositoryTest {
         likePost.setUser(dummyUser);
         likePost.setPost(dummyBlogPost);
         LikePost persistedLikePost = likePostRepository.save(likePost);
-        assertThat(persistedLikePost.getId(), notNullValue());
+        assertNotNull(persistedLikePost.getId());
     }
 
     @Test

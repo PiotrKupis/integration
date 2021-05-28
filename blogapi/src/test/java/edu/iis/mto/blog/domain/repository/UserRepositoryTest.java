@@ -13,16 +13,15 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DataJpaTest
 class UserRepositoryTest {
 
     @Autowired
     private TestEntityManager entityManager;
-
     @Autowired
     private UserRepository repository;
-
     private User user;
 
     @BeforeEach
@@ -38,10 +37,9 @@ class UserRepositoryTest {
     }
 
     @Test
-    void shouldFindNoUsersIfRepositoryIsEmpty() {
-
+    void shouldNotFindUsersIfRepositoryIsEmpty() {
         List<User> users = repository.findAll();
-        assertThat(users, hasSize(0));
+        assertEquals(users.size(), 0);
     }
 
     @Test
@@ -49,17 +47,14 @@ class UserRepositoryTest {
         User persistedUser = repository.save(user);
         List<User> users = repository.findAll();
 
-        assertThat(users, hasSize(1));
-        assertThat(users.get(0)
-                        .getEmail(),
-                equalTo(persistedUser.getEmail()));
+        assertEquals(users.size(), 1);
+        assertThat(users.get(0).getEmail(), equalTo(persistedUser.getEmail()));
     }
 
     @Test
     void shouldStoreANewUser() {
-
         User persistedUser = repository.save(user);
-        assertThat(persistedUser.getId(), notNullValue());
+        assertNotNull(persistedUser.getId());
     }
 
     @Test
@@ -103,11 +98,8 @@ class UserRepositoryTest {
 
         int expectedNumberOfResults = 0;
         entityManager.persist(user);
-
         List<User> users = repository.findByFirstNameContainingOrLastNameContainingOrEmailContainingAllIgnoreCase(" ", " ", " ");
 
         assertEquals(expectedNumberOfResults, users.size());
     }
-
-
 }
