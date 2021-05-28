@@ -1,24 +1,23 @@
 package edu.iis.mto.blog.api;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import edu.iis.mto.blog.api.request.UserRequest;
 import edu.iis.mto.blog.dto.Id;
 import edu.iis.mto.blog.services.BlogService;
 import edu.iis.mto.blog.services.DataFinder;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BlogApi.class)
 class BlogApiTest {
@@ -43,15 +42,32 @@ class BlogApiTest {
         String content = writeJson(user);
 
         mvc.perform(post("/blog/user").contentType(MediaType.APPLICATION_JSON)
-                                      .accept(MediaType.APPLICATION_JSON)
-                                      .content(content))
-           .andExpect(status().isCreated())
-           .andExpect(content().string(writeJson(new Id(newUserId))));
+                .accept(MediaType.APPLICATION_JSON)
+                .content(content))
+                .andExpect(status().isCreated())
+                .andExpect(content().string(writeJson(new Id(newUserId))));
+    }
+
+    @Test
+    public void shouldReturn409StatusCodeWhenThrowsDataIntegrityViolationException() throws Exception {
+
+        UserRequest userRequest = new UserRequest();
+        userRequest.setEmail("dummy@domain.com");
+        userRequest.setFirstName("Jan");
+        userRequest.setLastName("Nowak");
+
+        when(blogService.createUser(userRequest)).thenThrow(DataIntegrityViolationException.class);
+        String content = writeJson(userRequest);
+
+        mvc.perform(post("/blog/user").contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(content))
+                .andExpect(status().isConflict());
     }
 
     private String writeJson(Object obj) throws JsonProcessingException {
         return new ObjectMapper().writer()
-                                 .writeValueAsString(obj);
+                .writeValueAsString(obj);
     }
 
 }
