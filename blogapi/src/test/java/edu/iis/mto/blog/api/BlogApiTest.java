@@ -14,7 +14,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.persistence.EntityNotFoundException;
+
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -63,6 +66,13 @@ class BlogApiTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .content(content))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    public void shouldReturn404StatusCodeWhenUserDoesNotExist() throws Exception {
+        Long dummyUserId = 1L;
+        when(finder.getUserData(dummyUserId)).thenThrow(EntityNotFoundException.class);
+        mvc.perform(get("/blog/user/" + dummyUserId)).andExpect(status().isNotFound());
     }
 
     private String writeJson(Object obj) throws JsonProcessingException {
