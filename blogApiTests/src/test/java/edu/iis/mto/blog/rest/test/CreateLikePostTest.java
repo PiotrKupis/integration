@@ -1,0 +1,25 @@
+package edu.iis.mto.blog.rest.test;
+
+import io.restassured.http.ContentType;
+import org.apache.http.HttpStatus;
+import org.junit.jupiter.api.Test;
+
+import static io.restassured.RestAssured.given;
+
+public class CreateLikePostTest extends FunctionalTests {
+
+    private static final String CREATE_LIKE_POST_API = "/blog/user/{userId}/like/{postId}";
+
+    @Test
+    void shouldLikePostWhenUserIsConfirmed() {
+        given().accept(ContentType.JSON)
+                .header("Content-Type", "application/json;charset=UTF-8")
+                .pathParams("userId", 1, "postId", 1)
+                .expect()
+                .log()
+                .all()
+                .statusCode(HttpStatus.SC_OK)
+                .when()
+                .post(CREATE_LIKE_POST_API);
+    }
+}
