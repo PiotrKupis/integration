@@ -2,7 +2,7 @@
 insert into user (id, account_status, email, first_name, last_name) values (1, 'CONFIRMED', 'john@domain.com', 'John', 'Steward')
 insert into user (id, account_status, email, first_name) values (2, 'NEW', 'brian@domain.com', 'Brian')
 insert into user (id, account_status, email, first_name, last_name) values (3, 'CONFIRMED', 'dummyEmail1@domain.com', 'dummyName1', 'dummySurname1')
-insert into user (id, account_status, email, first_name, last_name) values (4, 'CONFIRMED', 'dummyEmail2.com', 'dummyName2', 'dummySurname2')
+insert into user (id, account_status, email, first_name, last_name) values (4, 'CONFIRMED', 'dummyEmail2@domain.com', 'dummyName2', 'dummySurname2')
 insert into blog_post (id, entry, user_id) values (1, 'dummy entry', 3)
 insert into like_post (id, post_id, user_id) values (1, 1, 4)
 
