@@ -5,6 +5,7 @@ import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 
 public class CreateLikePostTest extends FunctionalTests {
 
@@ -45,6 +46,20 @@ public class CreateLikePostTest extends FunctionalTests {
                 .log()
                 .all()
                 .statusCode(HttpStatus.SC_BAD_REQUEST)
+                .when()
+                .post(CREATE_LIKE_POST_API);
+    }
+
+    @Test
+    void createLikePostByUserWhoAlreadyLikedPostReturnsFalse() {
+        given().accept(ContentType.JSON)
+                .header("Content-Type", "application/json;charset=UTF-8")
+                .pathParams("userId", 4, "postId", 1)
+                .expect()
+                .log()
+                .all()
+                .statusCode(HttpStatus.SC_OK)
+                .body(equalTo("false"))
                 .when()
                 .post(CREATE_LIKE_POST_API);
     }
