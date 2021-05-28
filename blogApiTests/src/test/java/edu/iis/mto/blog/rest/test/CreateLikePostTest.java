@@ -22,4 +22,17 @@ public class CreateLikePostTest extends FunctionalTests {
                 .when()
                 .post(CREATE_LIKE_POST_API);
     }
+
+    @Test
+    void shouldNotLikePostWhenUserIsItsAuthor() {
+        given().accept(ContentType.JSON)
+                .header("Content-Type", "application/json;charset=UTF-8")
+                .pathParams("userId", 3, "postId", 1)
+                .expect()
+                .log()
+                .all()
+                .statusCode(HttpStatus.SC_BAD_REQUEST)
+                .when()
+                .post(CREATE_LIKE_POST_API);
+    }
 }
