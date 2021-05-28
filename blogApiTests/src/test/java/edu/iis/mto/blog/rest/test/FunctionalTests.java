@@ -1,8 +1,7 @@
 package edu.iis.mto.blog.rest.test;
 
-import org.junit.jupiter.api.BeforeAll;
-
 import io.restassured.RestAssured;
+import org.junit.jupiter.api.BeforeAll;
 
 abstract class FunctionalTests {
 

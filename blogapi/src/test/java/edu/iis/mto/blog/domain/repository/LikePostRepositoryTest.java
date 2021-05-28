@@ -14,7 +14,6 @@ import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DataJpaTest
@@ -32,7 +31,6 @@ public class LikePostRepositoryTest {
 
     @BeforeEach
     void setUp() {
-
         likePostRepository.deleteAll();
         likePostRepository.flush();
         blogPostRepository.deleteAll();

@@ -51,7 +51,7 @@ public class CreateLikePostTest extends FunctionalTests {
     }
 
     @Test
-    void createLikePostByUserWhoAlreadyLikedPostReturnsFalse() {
+    void shouldNotLikePostWhenUserAlreadyLikedPost() {
         given().accept(ContentType.JSON)
                 .header("Content-Type", "application/json;charset=UTF-8")
                 .pathParams("userId", 4, "postId", 1)

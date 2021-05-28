@@ -44,7 +44,7 @@ public class GetPostTest extends FunctionalTests {
     }
 
     @Test
-    void shouldReturnOneLikeCountWhenOneUserLikePost() {
+    void shouldReturnLikeCountEqualsOneWhenOneUserLikedPost() {
         Response response = given().accept(ContentType.JSON)
                 .pathParams("id", 1)
                 .expect()
@@ -57,5 +57,4 @@ public class GetPostTest extends FunctionalTests {
         JSONObject responseBody = new JSONObject(response.getBody().asString());
         assertThat(responseBody.getInt("likesCount"), equalTo(1));
     }
-
 }
