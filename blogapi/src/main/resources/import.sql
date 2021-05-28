@@ -5,3 +5,7 @@ insert into user (id, account_status, email, first_name, last_name) values (3, '
 insert into user (id, account_status, email, first_name, last_name) values (4, 'CONFIRMED', 'dummyEmail2.com', 'dummyName2', 'dummySurname2')
 insert into blog_post (id, entry, user_id) values (1, 'dummy entry', 3)
 insert into like_post (id, post_id, user_id) values (1, 1, 4)
+
+insert into blog_post (id, entry, user_id) values (2, 'dummy entry2', 3)
+insert into user (id, account_status, email, first_name, last_name) values (5, 'REMOVED', 'dummyEmail3@domain.com', 'dummyName3', 'dummySurname3')
+insert into blog_post (id, entry, user_id) values (3, 'dummy entry3', 5)
