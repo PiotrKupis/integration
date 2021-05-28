@@ -29,5 +29,34 @@ public class GetUserTest extends FunctionalTests {
         assertThat(responseBody.length(), equalTo(1));
     }
 
+    @Test
+    void shouldReturnUserByNameWhenPassedName() {
+        Response response = given().accept(ContentType.JSON)
+                .queryParam("searchString", "John")
+                .expect()
+                .log()
+                .all()
+                .statusCode(HttpStatus.SC_OK)
+                .when()
+                .get(GET_USER_API);
 
+        JSONArray responseBody = new JSONArray(response.getBody().asString());
+        assertThat(responseBody.length(), equalTo(1));
+    }
+
+    @Test
+    void shouldReturnUserBySurnameWhenPassedSurname() {
+        Response response = given().accept(ContentType.JSON)
+                .queryParam("searchString", "Steward")
+                .expect()
+                .log()
+                .all()
+                .statusCode(HttpStatus.SC_OK)
+                .when()
+                .get(GET_USER_API);
+
+        JSONArray responseBody = new JSONArray(response.getBody().asString());
+        assertThat(responseBody.length(), equalTo(1));
+    }
+    
 }
